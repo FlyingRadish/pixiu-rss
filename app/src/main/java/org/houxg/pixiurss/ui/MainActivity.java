@@ -1,10 +1,11 @@
-package org.houxg.pixiurss;
+package org.houxg.pixiurss.ui;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-import org.houxg.pixiurss.module.RSSGetter;
+import org.houxg.pixiurss.R;
+import org.houxg.pixiurss.module.rss.RSSGetter;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;

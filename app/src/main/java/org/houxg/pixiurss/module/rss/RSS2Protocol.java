@@ -1,4 +1,4 @@
-package org.houxg.pixiurss.module;
+package org.houxg.pixiurss.module.rss;
 
 /**
  * desc:RSS2协议

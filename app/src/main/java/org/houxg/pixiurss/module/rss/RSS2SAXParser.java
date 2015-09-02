@@ -1,4 +1,4 @@
-package org.houxg.pixiurss.module;
+package org.houxg.pixiurss.module.rss;
 
 import android.util.Log;
 

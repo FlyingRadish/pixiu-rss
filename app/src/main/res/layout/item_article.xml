@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/shape_article"
+    android:paddingBottom="4dp"
+    android:paddingLeft="4dp"
+    android:paddingRight="4dp"
+    android:paddingTop="4dp">
+
+    <TextView
+        android:id="@+id/text_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:text="贝尔金热门Wi-Fi路由器爆出安全漏洞"
+        android:textColor="#313131"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/text_desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/text_title"
+        android:layout_marginBottom="4dp"
+        android:layout_marginTop="6dp"
+        android:maxLines="3"
+        android:text="如果你的Wi-Fi网络使用的是贝尔金流行的N600 DB路由器，那么你要注意了，它可能有多个漏洞，这些漏洞可能让黑客接管你的路由器。远程未授权的..."
+        android:textColor="#949494"
+        android:textSize="12sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/text_desc"
+        android:singleLine="true"
+        android:text="2015-08-21 19:09:53"
+        android:textColor="#d8d8d8"
+        android:textSize="10sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/text_desc"
+        android:singleLine="true"
+        android:text="from cnbeta"
+        android:textColor="#d8d8d8"
+        android:textSize="10sp" />
+</RelativeLayout>
