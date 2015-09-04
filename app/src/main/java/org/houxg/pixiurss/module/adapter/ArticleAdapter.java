@@ -6,7 +6,7 @@ import android.widget.TextView;
 
 import org.houxg.pixiurss.R;
 import org.houxg.pixiurss.model.RSS2Item;
-import org.houxg.pixiurss.utils.RecyclerListAdapter;
+import org.houxg.pixiurss.utils.recyclerview.RecyclerListAdapter;
 
 import java.util.List;
 

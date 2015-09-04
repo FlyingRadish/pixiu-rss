@@ -1,4 +1,4 @@
-package org.houxg.pixiurss;
+package org.houxg.pixiurss.module;
 
 import android.app.Application;
 

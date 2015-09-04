@@ -1,4 +1,4 @@
-package org.houxg.pixiurss.utils;
+package org.houxg.pixiurss.utils.recyclerview;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;

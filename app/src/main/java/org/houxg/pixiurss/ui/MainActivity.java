@@ -9,8 +9,13 @@ import android.util.Log;
 
 import org.houxg.pixiurss.R;
 import org.houxg.pixiurss.model.RSS2Channel;
+import org.houxg.pixiurss.model.RSS2Item;
 import org.houxg.pixiurss.module.adapter.ArticleAdapter;
 import org.houxg.pixiurss.module.rss.RSSGetter;
+import org.houxg.pixiurss.utils.recyclerview.LinearItemDecoration;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -32,12 +37,14 @@ public class MainActivity extends AppCompatActivity {
         toolbar.setNavigationIcon(R.drawable.icon_back);
 
         LinearLayoutManager layout = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-
+        LinearItemDecoration itemDecoration = new LinearItemDecoration(12, 12, 12, 12);
+        itemDecoration.setDividerSize(18);
         listItem.setLayoutManager(layout);
-        adapter = new ArticleAdapter(null);
+        listItem.addItemDecoration(itemDecoration);
+        adapter = new ArticleAdapter(items);
+        listItem.setAdapter(adapter);
 
-
-        RSSGetter getter = new RSSGetter(new String[]{"http://rss.cnbeta.com/rss"}, null);
+        RSSGetter getter = new RSSGetter(new String[]{"http://rss.cnbeta.com/rss", "http://jandan.net/feed"}, null);
         getter.subscribe(listener, errorListener);
         new Thread(getter).start();
     }
@@ -47,17 +54,20 @@ public class MainActivity extends AppCompatActivity {
     RSSGetter.Listener listener = new RSSGetter.Listener() {
         @Override
         public void onSuccess(RSS2Channel data, int index, int total) {
-            adapter = new ArticleAdapter(data.getItems());
-            listItem.setAdapter(adapter);
+            int pos = items.size();
+            items.addAll(data.getItems());
+            adapter.notifyItemInserted(pos);
             Log.i("houxg", "update!" + index);
         }
     };
 
-    RSSGetter.ErrorListener errorListener  = new RSSGetter.ErrorListener() {
+    RSSGetter.ErrorListener errorListener = new RSSGetter.ErrorListener() {
         @Override
         public void onError(int index, int total) {
-            Log.i("houxg", "error on="+index);
+            Log.i("houxg", "error on=" + index);
         }
     };
+
+    List<RSS2Item> items = new ArrayList<>();
 
 }

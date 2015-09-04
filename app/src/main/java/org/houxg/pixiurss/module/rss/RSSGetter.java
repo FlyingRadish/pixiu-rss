@@ -9,7 +9,7 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
-import org.houxg.pixiurss.App;
+import org.houxg.pixiurss.module.App;
 import org.houxg.pixiurss.model.RSS2Channel;
 import org.xml.sax.SAXException;
 
