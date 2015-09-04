@@ -14,6 +14,7 @@ public class RSS2Item {
     String pubDate;
     String guid;
     String comments;
+    String channelTitle;
 
     public void setTitle(String title) {
         this.title = title == null ? "" : title;
@@ -37,6 +38,14 @@ public class RSS2Item {
 
     public void setComments(String comments) {
         this.comments = comments == null ? "" : comments;
+    }
+
+    public String getChannelTitle() {
+        return channelTitle;
+    }
+
+    public void setChannelTitle(String channelTitle) {
+        this.channelTitle = channelTitle;
     }
 
     public String getTitle() {
@@ -72,6 +81,7 @@ public class RSS2Item {
                 ", pubDate='" + pubDate + '\'' +
                 ", guid='" + guid + '\'' +
                 ", comments='" + comments + '\'' +
+                ", channelTitle='" + channelTitle + '\'' +
                 '}';
     }
 }

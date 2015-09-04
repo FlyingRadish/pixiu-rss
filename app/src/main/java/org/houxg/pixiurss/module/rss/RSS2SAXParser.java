@@ -2,13 +2,13 @@ package org.houxg.pixiurss.module.rss;
 
 import android.util.Log;
 
+import org.houxg.pixiurss.model.RSS2Channel;
 import org.houxg.pixiurss.model.RSS2Item;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * desc:RSS解析器
@@ -19,21 +19,26 @@ import java.util.List;
  */
 public class RSS2SAXParser extends DefaultHandler {
 
-    List<RSS2Item> items;
+    RSS2Channel channel;
     StringBuilder stringBuilder;
     RSS2Item item;
 
-    boolean isInItem = false;
-    boolean isInChannel = false;
-    boolean isInImage = false;
+    String channelTitle = "";
 
+    String parentTag = "";
+
+    public RSS2Channel getResult() {
+        return channel;
+    }
 
     @Override
     public void startDocument() throws SAXException {
         super.startDocument();
-        items = new ArrayList<>();
+        channel = new RSS2Channel();
+        channel.setItems(new ArrayList<RSS2Item>());
         stringBuilder = new StringBuilder();
     }
+
 
     @Override
     public void characters(char[] ch, int start, int length) throws SAXException {
@@ -45,13 +50,15 @@ public class RSS2SAXParser extends DefaultHandler {
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
         super.startElement(uri, localName, qName, attributes);
         stringBuilder.delete(0, stringBuilder.length());    //清空Builder
-        if (RSS2Protocol.CHANNEL.equals(localName)) {
 
+        if (RSS2Protocol.CHANNEL.equals(localName)) {
+            parentTag = localName;
         } else if (RSS2Protocol.CHANNEL_IMAGE.equals(localName)) {
-            isInImage = true;
+            parentTag = localName;
         } else if (RSS2Protocol.CHANNEL_ITEM.equals(localName)) {
+            Log.i("houxg", "uri=" + uri + ", qName=" + qName);
+            parentTag = localName;
             item = new RSS2Item();
-            isInItem = true;
         }
     }
 
@@ -59,20 +66,19 @@ public class RSS2SAXParser extends DefaultHandler {
     public void endElement(String uri, String localName, String qName) throws SAXException {
         super.endElement(uri, localName, qName);
         String character = stringBuilder.toString();
-        if (RSS2Protocol.CHANNEL.equals(localName)) {
 
-        } else if (RSS2Protocol.CHANNEL_TITLE.equals(localName)) {
-
-        } else if (RSS2Protocol.CHANNEL_LINK.equals(localName)) {
-
-        } else if (RSS2Protocol.CHANNEL_IMAGE.equals(localName)) {
-            isInImage = false;
-        } else if (RSS2Protocol.CHANNEL_ITEM.equals(localName)) {
-            items.add(item);
-            Log.i("houxg", item.toString());
-            isInItem = false;
+        Log.i("houxg", "qName=" + qName);
+        if (RSS2Protocol.CHANNEL.equals(parentTag)) {
+            if (RSS2Protocol.CHANNEL_TITLE.equals(localName)) {
+                channelTitle = character;
+                channel.setTitle(channelTitle);
+                Log.i("houxg", "channelTitle=" + channelTitle);
+            } else if (RSS2Protocol.CHANNEL_LINK.equals(localName)) {
+                channel.setLink(character);
+            }
         }
-        if(isInImage) {
+
+        if (RSS2Protocol.CHANNEL_IMAGE.equals(parentTag)) {
             if (RSS2Protocol.IMAGE_URL.equals(localName)) {
 
             } else if (RSS2Protocol.IMAGE_LINK.equals(localName)) {
@@ -82,8 +88,12 @@ public class RSS2SAXParser extends DefaultHandler {
             }
         }
 
-        if (isInItem) {
-            if (RSS2Protocol.ITEM_LINK.equals(localName)) {
+        if (RSS2Protocol.CHANNEL_ITEM.equals(parentTag)) {
+            if (RSS2Protocol.CHANNEL_ITEM.equals(localName)) {
+                item.setChannelTitle(channelTitle);
+                channel.getItems().add(item);
+                Log.i("houxg", item.toString());
+            } else if (RSS2Protocol.ITEM_LINK.equals(localName)) {
                 item.setLink(character);
             } else if (RSS2Protocol.ITEM_PUBDATE.equals(localName)) {
                 item.setPubDate(character);

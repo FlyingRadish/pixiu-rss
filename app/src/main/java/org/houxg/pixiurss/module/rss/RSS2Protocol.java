@@ -2,9 +2,9 @@ package org.houxg.pixiurss.module.rss;
 
 /**
  * desc:RSS2协议
- * </br>
+ * <br>
  * author: houxg
- * </br>
+ * <br>
  * create on 2015/9/2
  */
 public class RSS2Protocol {

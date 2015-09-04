@@ -18,7 +18,7 @@
         android:textSize="14sp" />
 
     <TextView
-        android:id="@+id/text_desc"
+        android:id="@+id/text_content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/text_title"
@@ -30,20 +30,22 @@
         android:textSize="12sp" />
 
     <TextView
+        android:id="@+id/text_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@id/text_desc"
+        android:layout_below="@id/text_content"
         android:singleLine="true"
         android:text="2015-08-21 19:09:53"
         android:textColor="#d8d8d8"
         android:textSize="10sp" />
 
     <TextView
+        android:id="@+id/text_src"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_below="@id/text_desc"
+        android:layout_below="@id/text_content"
         android:singleLine="true"
         android:text="from cnbeta"
         android:textColor="#d8d8d8"
