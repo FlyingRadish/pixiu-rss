@@ -21,8 +21,9 @@ public class LinearItemDecoration extends RecyclerView.ItemDecoration {
         paddingRect = new Rect(left, top, right, bottom);
     }
 
-    public void setDividerSize(int size) {
+    public LinearItemDecoration setDividerSize(int size) {
         dividerSize = size;
+        return this;
     }
 
     public void setHasHeader(boolean hasHeader) {
