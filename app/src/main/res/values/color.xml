@@ -9,4 +9,12 @@
     <color name="status_bar">#25282c</color>
     <color name="title">#313842</color>
 
+
+    <color name="dialog_btn_positive_bg_pressed">#aaaaaa</color>
+    <color name="dialog_btn_positive_bg_normal">#ffffff</color>
+    <color name="dialog_btn_negative_bg_pressed">#aaaaaa</color>
+    <color name="dialog_btn_negative_bg_normal">#ffffff</color>
+    <color name="dialog_text_title_text">#333333</color>
+    <color name="dialog_divider_btn">#aaaaaa</color>
+
 </resources>
