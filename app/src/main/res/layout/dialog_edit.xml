@@ -4,12 +4,12 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/dialog_text_message"
+    <EditText
+        android:id="@+id/dialog_edit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="16dp"
         android:text="您所拨打的用户正在洗澡"
-        android:textSize="14sp"
-        android:padding="16dp" />
+        android:textSize="14sp" />
 
 </merge>

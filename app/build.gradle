@@ -17,6 +17,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    sourceSets{
+        main{
+            java.srcDirs = ['src/main/java', 'src-gen']
+        }
+    }
 }
 
 dependencies {
@@ -27,4 +33,7 @@ dependencies {
     compile 'com.android.support:design:22.2.0'
     compile 'com.android.support:recyclerview-v7:22.2.0'
     compile 'com.squareup.okhttp:okhttp:2.4.0'
+    compile 'de.greenrobot:greendao:2.0.0'
+    compile 'net.danlew:android.joda:2.8.2'
+
 }

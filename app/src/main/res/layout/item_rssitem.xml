@@ -25,7 +25,8 @@
         android:layout_below="@id/text_title"
         android:layout_marginBottom="4dp"
         android:layout_marginTop="6dp"
-        android:maxLines="3"
+        android:ellipsize="end"
+        android:lines="3"
         android:text="如果你的Wi-Fi网络使用的是贝尔金流行的N600 DB路由器，那么你要注意了，它可能有多个漏洞，这些漏洞可能让黑客接管你的路由器。远程未授权的..."
         android:textColor="#949494"
         android:textSize="12sp" />

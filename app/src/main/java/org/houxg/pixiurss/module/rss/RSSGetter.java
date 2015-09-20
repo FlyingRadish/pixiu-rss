@@ -9,12 +9,15 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
-import org.houxg.pixiurss.module.App;
 import org.houxg.pixiurss.model.RSS2Channel;
+import org.houxg.pixiurss.model.RSS2Item;
+import org.houxg.pixiurss.module.App;
+import org.houxg.pixiurss.utils.CancelRunnable;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -27,7 +30,9 @@ import javax.xml.parsers.SAXParserFactory;
  * </br>
  * create on 2015/9/1
  */
-public class RSSGetter extends Thread {
+public class RSSGetter implements CancelRunnable {
+
+    private final static String TAG = "RSSGetter";
 
     String[] urls;
     Object tag;
@@ -35,14 +40,10 @@ public class RSSGetter extends Thread {
     Listener listener;
     ErrorListener errorListener;
     DeliverHandler handler;
+    RSS2SAXParser rssParser;
 
-    public interface Listener {
-        void onSuccess(RSS2Channel data, int index, int total);
-    }
 
-    public interface ErrorListener {
-        void onError(int index, int total);
-    }
+    boolean isCancel = false;
 
     public RSSGetter(String[] urls, Object tag) {
         this.urls = urls;
@@ -56,8 +57,13 @@ public class RSSGetter extends Thread {
         this.errorListener = errorListener;
     }
 
+    @Override
     public void cancel() {
         getClient().cancel(tag);
+        isCancel = true;
+        if (rssParser != null) {
+            rssParser.cancel();
+        }
     }
 
     private OkHttpClient getClient() {
@@ -65,28 +71,47 @@ public class RSSGetter extends Thread {
     }
 
     public void run() {
+        Log.i(TAG, "start");
         if (urls == null || urls.length == 0) {
+            Log.i(TAG, "no urls");
             return;
         }
         OkHttpClient client = getClient();
+        rssParser = new RSS2SAXParser();
         for (int i = 0; i < urls.length; i++) {
+            Log.i(TAG, "get rss, url=" + urls[i]);
             Request request = getRequestByUrl(urls[i]);
+            InputStream stream = null;
             try {
                 Response response = client.newCall(request).execute();
-                InputStream stream = response.body().byteStream();
+                stream = response.body().byteStream();
                 SAXParserFactory factory = SAXParserFactory.newInstance();
                 SAXParser parser = factory.newSAXParser();
-                RSS2SAXParser rssParser = new RSS2SAXParser();
                 long last = System.currentTimeMillis();
                 parser.parse(stream, rssParser);
                 stream.close();
-                Log.i("houxg", "time=" + (System.currentTimeMillis() - last));
-                handler.obtainMessage(DeliverHandler.WHAT_SUCCESS, i, urls.length, rssParser.getResult()).sendToTarget();
+                Log.i(TAG, "parse time=" + (System.currentTimeMillis() - last));
+                if (!isCancel) {
+                    handler.obtainMessage(DeliverHandler.WHAT_SUCCESS, i, urls.length, new Wrapper(urls[i], rssParser.getResultChannel(), rssParser.getItemList())).sendToTarget();
+                } else {
+                    break;
+                }
             } catch (IOException | ParserConfigurationException | SAXException e) {
                 e.printStackTrace();
-                handler.obtainMessage(DeliverHandler.WHAT_ERROR, i, urls.length).sendToTarget();
+                try {
+                    if (stream != null) {
+                        stream.close();
+                    }
+                } catch (Exception ignored) {
+                }
+                if (!isCancel) {
+                    handler.obtainMessage(DeliverHandler.WHAT_ERROR, i, urls.length).sendToTarget();
+                } else {
+                    break;
+                }
             }
         }
+        Log.i(TAG, "rss get end");
         handler.destroy();
     }
 
@@ -96,11 +121,18 @@ public class RSSGetter extends Thread {
                 .build();
     }
 
-    static class DeliverHandler extends Handler {
-        RSSGetter getter;
+    public interface Listener {
+        void onSuccess(String url, RSS2Channel data, List<RSS2Item> itemList, int index, int total);
+    }
 
+    public interface ErrorListener {
+        void onError(int index, int total);
+    }
+
+    static class DeliverHandler extends Handler {
         public static final int WHAT_SUCCESS = 1;
         public static final int WHAT_ERROR = 2;
+        RSSGetter getter;
 
         public DeliverHandler(Looper mainLooper, RSSGetter rssGetter) {
             super(mainLooper);
@@ -113,7 +145,8 @@ public class RSSGetter extends Thread {
             switch (msg.what) {
                 case WHAT_SUCCESS:
                     if (getter.listener != null) {
-                        getter.listener.onSuccess((RSS2Channel) msg.obj, msg.arg1, msg.arg2);
+                        Wrapper wrapper = (Wrapper) msg.obj;
+                        getter.listener.onSuccess(wrapper.url, wrapper.channel, wrapper.itemList, msg.arg1, msg.arg2);
                     }
                     break;
                 case WHAT_ERROR:
@@ -126,6 +159,18 @@ public class RSSGetter extends Thread {
 
         public void destroy() {
             removeCallbacks(null);
+        }
+    }
+
+    static class Wrapper {
+        RSS2Channel channel;
+        List<RSS2Item> itemList;
+        String url;
+
+        public Wrapper(String url, RSS2Channel channel, List<RSS2Item> itemList) {
+            this.channel = channel;
+            this.itemList = itemList;
+            this.url = url;
         }
     }
 }

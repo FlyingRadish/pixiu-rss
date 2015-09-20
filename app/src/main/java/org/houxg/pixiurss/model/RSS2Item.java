@@ -1,5 +1,10 @@
 package org.houxg.pixiurss.model;
 
+import org.houxg.pixiurss.Article;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * desc:
  * <br/>
@@ -8,28 +13,70 @@ package org.houxg.pixiurss.model;
  * create on: 2015/8/22
  */
 public class RSS2Item {
-    String title;
-    String link;
-    String desc;
-    String pubDate;
+
+    Article article;
+
     String guid;
     String comments;
     String channelTitle;
 
+    public RSS2Item() {
+        article = new Article();
+    }
+
+    public static RSS2Item fromDao(Article dao) {
+        RSS2Item item = null;
+        if (dao != null) {
+            item = new RSS2Item();
+            item.article = dao;
+            item.channelTitle = dao.getSource().getTitle();
+        }
+        return item;
+    }
+
+    public static List<RSS2Item> fromDaos(List<Article> daos) {
+        List<RSS2Item> output = new ArrayList<>();
+        if (daos != null) {
+            for (Article article : daos) {
+                RSS2Item item = RSS2Item.fromDao(article);
+                if (item != null) {
+                    output.add(item);
+                }
+            }
+        }
+        return output;
+    }
+
+    public Article toDao(){
+        return article;
+    }
+
+    public static List<Article> toDaos(List<RSS2Item> items){
+        List<Article> output = new ArrayList<>();
+        if (items != null) {
+            for (RSS2Item item : items) {
+                if (item != null) {
+                    output.add(item.toDao());
+                }
+            }
+        }
+        return output;
+    }
+
     public void setTitle(String title) {
-        this.title = title == null ? "" : title;
+        article.setTitle(title);
     }
 
     public void setLink(String link) {
-        this.link = link == null ? "" : link;
+        article.setLink(link);
     }
 
     public void setDesc(String desc) {
-        this.desc = desc == null ? "" : desc;
+        article.setDesc(desc);
     }
 
-    public void setPubDate(String pubDate) {
-        this.pubDate = pubDate == null ? "" : pubDate;
+    public void setPubDate(long pubDate) {
+        article.setPubTime(pubDate);
     }
 
     public void setGuid(String guid) {
@@ -49,19 +96,19 @@ public class RSS2Item {
     }
 
     public String getTitle() {
-        return title;
+        return article.getTitle();
     }
 
     public String getLink() {
-        return link;
+        return article.getLink();
     }
 
     public String getDesc() {
-        return desc;
+        return article.getDesc();
     }
 
-    public String getPubDate() {
-        return pubDate;
+    public long getPubDate() {
+        return article.getPubTime();
     }
 
     public String getGuid() {
@@ -75,10 +122,7 @@ public class RSS2Item {
     @Override
     public String toString() {
         return "RSS2Item{" +
-                "title='" + title + '\'' +
-                ", link='" + link + '\'' +
-                ", desc='" + desc + '\'' +
-                ", pubDate='" + pubDate + '\'' +
+                "article=" + article +
                 ", guid='" + guid + '\'' +
                 ", comments='" + comments + '\'' +
                 ", channelTitle='" + channelTitle + '\'' +

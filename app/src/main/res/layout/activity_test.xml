@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <org.houxg.pixiurss.utils.customview.AppBar
+        android:id="@+id/app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/height_activity_title"
+        android:background="@color/title" />
+
+    <Button
+        android:id="@+id/btn_test"
+        android:layout_width="100dp"
+        android:layout_height="50dp" />
+
+    <TextView
+        android:id="@+id/text_output"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</LinearLayout>

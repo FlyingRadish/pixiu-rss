@@ -16,8 +16,8 @@ import java.util.List;
  */
 public abstract class RecyclerListAdapter<T, VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
 
-    List<T> data;
-    int layoutId = -1;
+    protected List<T> data;
+    protected int layoutId = -1;
 
     public RecyclerListAdapter(int layoutId, List<T> data) {
         this.data = data;
@@ -26,9 +26,12 @@ public abstract class RecyclerListAdapter<T, VH extends RecyclerView.ViewHolder>
 
     @Override
     public VH onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(layoutId, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(getLayoutIdByType(viewType), parent, false);
+        return onBindViewToVH(view, viewType);
+    }
 
-        return onBindViewToVH(view);
+    protected int getLayoutIdByType(int type) {
+        return layoutId;
     }
 
     @Override
@@ -38,7 +41,7 @@ public abstract class RecyclerListAdapter<T, VH extends RecyclerView.ViewHolder>
 
     public abstract void onBind(VH holder, T item, int position);
 
-    protected abstract VH onBindViewToVH(View view);
+    protected abstract VH onBindViewToVH(View view, int type);
 
     @Override
     public int getItemCount() {
@@ -50,7 +53,7 @@ public abstract class RecyclerListAdapter<T, VH extends RecyclerView.ViewHolder>
     }
 
     protected T getItem(int pos) {
-        if(data==null ||pos<0||pos>data.size()-1){
+        if (data == null || pos < 0 || pos > data.size() - 1) {
             return null;
         }
         return data.get(pos);

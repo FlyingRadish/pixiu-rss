@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="LoadingWheel">
+        <attr name="strokeColor" format="color" />
+        <attr name="strokeWidth" format="dimension" />
+        <attr name="startDuration" format="integer" />
+        <attr name="endDuration" format="integer" />
+        <attr name="wheelRad" format="dimension" />
+    </declare-styleable>
+
+    <declare-styleable name="Divider">
+        <attr name="dividerColor" format="color" />
+        <attr name="dividerWidth" format="dimension" />
+        <attr name="dividerDirection" />
+        <attr name="extraDrawable" format="reference" />
+        <attr name="center" format="boolean" />
+        <attr name="draw" format="boolean" />
+        <attr name="startPadding" format="dimension" />
+        <attr name="endPadding" format="dimension" />
+        <attr name="drawablePaddingStart" format="dimension" />
+    </declare-styleable>
+
+    <declare-styleable name="CircleImageView">
+        <attr name="border_width" format="dimension" />
+        <attr name="border_color" format="color" />
+        <attr name="border_overlay" format="boolean" />
+    </declare-styleable>
+
+    <attr name="dividerDirection" format="enum">
+        <enum name="horizontal" value="1" />
+        <enum name="vertical" value="2" />
+    </attr>
+
+    <attr name="strokeLineColor" format="color" />
+    <attr name="strokeLineWidth" format="dimension" />
+    <attr name="strokeLinePosition" format="enum">
+        <enum name="top" value="1" />
+        <enum name="bottom" value="2" />
+        <enum name="both" value="3" />
+    </attr>
+
+    <declare-styleable name="StrokeRelativeLayout">
+        <attr name="strokeLineColor" />
+        <attr name="strokeLineWidth" />
+        <attr name="strokeLinePosition" />
+    </declare-styleable>
+
+    <declare-styleable name="RoundImageView">
+        <attr name="whiteGapWidth" format="dimension" />
+    </declare-styleable>
+
+    <declare-styleable name="RoundRectImageView">
+        <attr name="rad" format="dimension" />
+    </declare-styleable>
+</resources>

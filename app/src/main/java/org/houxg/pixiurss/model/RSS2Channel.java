@@ -1,5 +1,8 @@
 package org.houxg.pixiurss.model;
 
+import org.houxg.pixiurss.Source;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -10,10 +13,8 @@ import java.util.List;
  * create on: 2015/8/23
  */
 public class RSS2Channel {
-    String title;
-    String link;
+    Source source;
     String desc;
-
     String lang;
     String copyRight;
     String pubDate;
@@ -24,14 +25,47 @@ public class RSS2Channel {
     String skipDays;
 
     RSS2Image img;
-    List<RSS2Item> items;
 
-    public List<RSS2Item> getItems() {
-        return items;
+    public RSS2Channel() {
+        source = new Source();
     }
 
-    public void setItems(List<RSS2Item> items) {
-        this.items = items;
+    public static RSS2Channel fromDao(Source dao) {
+        RSS2Channel channel = null;
+        if (dao != null) {
+            channel = new RSS2Channel();
+            channel.source = dao;
+        }
+        return channel;
+    }
+
+    public static List<RSS2Channel> fromDaos(List<Source> daos) {
+        List<RSS2Channel> output = new ArrayList<>();
+        if (daos != null) {
+            for (Source source : daos) {
+                RSS2Channel channel = RSS2Channel.fromDao(source);
+                if (channel != null) {
+                    output.add(channel);
+                }
+            }
+        }
+        return output;
+    }
+
+    public static List<Source> toDaos(List<RSS2Channel> channels) {
+        List<Source> output = new ArrayList<>();
+        if (channels != null) {
+            for (RSS2Channel channel : channels) {
+                if (channel != null) {
+                    output.add(channel.toDao());
+                }
+            }
+        }
+        return output;
+    }
+
+    public Source toDao() {
+        return source;
     }
 
     public RSS2Image getImg() {
@@ -115,18 +149,26 @@ public class RSS2Channel {
     }
 
     public String getLink() {
-        return link;
+        return source.getLink();
     }
 
     public void setLink(String link) {
-        this.link = link;
+        source.setLink(link);
     }
 
     public String getTitle() {
-        return title;
+        return source.getTitle();
     }
 
     public void setTitle(String title) {
-        this.title = title;
+        source.setTitle(title);
+    }
+
+    public String getAlias() {
+        return source.getAlias();
+    }
+
+    public void setAlias(String alias) {
+        source.setAlias(alias);
     }
 }
