@@ -64,6 +64,15 @@ public class RSS2Channel {
         return output;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof RSS2Channel) {
+            RSS2Channel channel = (RSS2Channel) o;
+            return getLink().equals(channel.getLink());
+        }
+        return false;
+    }
+
     public Source toDao() {
         return source;
     }

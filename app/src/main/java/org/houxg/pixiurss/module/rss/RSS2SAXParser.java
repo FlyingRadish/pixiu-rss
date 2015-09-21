@@ -77,11 +77,11 @@ public class RSS2SAXParser extends DefaultHandler {
             parentTag = localName;
             item = new RSS2Item();
         }
-//        try {
-//            Thread.sleep(50);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
+        try {
+            Thread.sleep(50);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -113,7 +113,7 @@ public class RSS2SAXParser extends DefaultHandler {
             if (RSS2Protocol.CHANNEL_ITEM.equals(localName)) {
                 item.setChannelTitle(channelTitle);
                 itemList.add(item);
-                Log.i("houxg", item.toString());
+//                Log.i("houxg", item.toString());
             } else if (RSS2Protocol.ITEM_LINK.equals(localName)) {
                 item.setLink(character);
             } else if (RSS2Protocol.ITEM_PUBDATE.equals(localName)) {

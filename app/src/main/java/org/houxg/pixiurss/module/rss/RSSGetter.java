@@ -41,7 +41,7 @@ public class RSSGetter implements CancelRunnable {
     ErrorListener errorListener;
     DeliverHandler handler;
     RSS2SAXParser rssParser;
-
+    boolean isRunning = false;
 
     boolean isCancel = false;
 
@@ -59,6 +59,7 @@ public class RSSGetter implements CancelRunnable {
 
     @Override
     public void cancel() {
+        isRunning = false;
         getClient().cancel(tag);
         isCancel = true;
         if (rssParser != null) {
@@ -66,23 +67,29 @@ public class RSSGetter implements CancelRunnable {
         }
     }
 
+    public boolean isRunning() {
+        return isRunning;
+    }
+
     private OkHttpClient getClient() {
         return App.getOKHttpClient();
     }
 
     public void run() {
+        isRunning = true;
         Log.i(TAG, "start");
         if (urls == null || urls.length == 0) {
             Log.i(TAG, "no urls");
+            isRunning = false;
             return;
         }
         OkHttpClient client = getClient();
         rssParser = new RSS2SAXParser();
         for (int i = 0; i < urls.length; i++) {
             Log.i(TAG, "get rss, url=" + urls[i]);
-            Request request = getRequestByUrl(urls[i]);
             InputStream stream = null;
             try {
+                Request request = getRequestByUrl(urls[i]);
                 Response response = client.newCall(request).execute();
                 stream = response.body().byteStream();
                 SAXParserFactory factory = SAXParserFactory.newInstance();
@@ -96,7 +103,7 @@ public class RSSGetter implements CancelRunnable {
                 } else {
                     break;
                 }
-            } catch (IOException | ParserConfigurationException | SAXException e) {
+            } catch (IllegalArgumentException | IOException | ParserConfigurationException | SAXException e) {
                 e.printStackTrace();
                 try {
                     if (stream != null) {
@@ -113,6 +120,7 @@ public class RSSGetter implements CancelRunnable {
         }
         Log.i(TAG, "rss get end");
         handler.destroy();
+        isRunning = false;
     }
 
     public Request getRequestByUrl(String url) {

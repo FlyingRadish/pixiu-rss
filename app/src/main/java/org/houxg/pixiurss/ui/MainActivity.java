@@ -18,6 +18,7 @@ import org.houxg.pixiurss.module.rss.RSSGetter;
 import org.houxg.pixiurss.ui.base.BaseActivity;
 import org.houxg.pixiurss.utils.recyclerview.LinearItemDecoration;
 import org.houxg.pixiurss.utils.toolbox.OpenTool;
+import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +38,8 @@ public class MainActivity extends BaseActivity {
 
     RSSGetter getter;
     RSSAdapter adapter;
+
+    long time = 0;
 
     @Override
     protected int getLayoutId() {
@@ -96,6 +99,8 @@ public class MainActivity extends BaseActivity {
                 }
                 getter = new RSSGetter(channelLinks, null);
                 getter.subscribe(listener, errorListener);
+                time = System.currentTimeMillis();
+//                Log.i("houxg", "start");
                 App.ThreadPoolExecut(getter);
             }
         });
@@ -104,7 +109,7 @@ public class MainActivity extends BaseActivity {
         for (RSS2Channel channel : sources) {
             int pos = adapter.getItemCount();
             channel.toDao().resetArticleList();
-            items.addAll(RSS2Item.fromDaos(channel.toDao().getArticleList()));
+            updateData(channel, RSS2Item.fromDaos(channel.toDao().getArticleList()));
             adapter.notifyItemInserted(pos);
         }
     }
@@ -114,6 +119,16 @@ public class MainActivity extends BaseActivity {
             case R.id.btn_manage_channel:
                 OpenTool.startActivity(this, ChannelManagerActivity.class);
                 break;
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (getter.isRunning()) {
+            ptrLayout.refreshComplete();
+            getter.cancel();
+        } else {
+            super.onBackPressed();
         }
     }
 
@@ -131,14 +146,10 @@ public class MainActivity extends BaseActivity {
             ptrLayout.refreshComplete();
         }
     };
-    List<RSS2Item> items = new ArrayList<>();
     RSSGetter.Listener listener = new RSSGetter.Listener() {
         @Override
         public void onSuccess(String url, RSS2Channel data, List<RSS2Item> itemList, int index, int total) {
-            int pos = adapter.getItemCount();
-            adapter.insert(data, itemList);
-            adapter.notifyItemInserted(pos);
-            Log.i("houxg", "update!" + index);
+//            Log.i("houxg", "Network data come, network " + showTime());
             List<RSS2Channel> channels = RSS2Channel.fromDaos(App.getDaoSession()
                     .getSourceDao()
                     .queryBuilder()
@@ -146,14 +157,52 @@ public class MainActivity extends BaseActivity {
                     .list());
             if (channels.size() > 0) {
                 RSS2Channel channel = channels.get(0);
-                for (RSS2Item item : itemList) {
+                channel.setTitle(data.getTitle());
+                for (int i = 0; i < itemList.size(); i++) {
+                    RSS2Item item = itemList.get(i);
                     item.toDao().setSourceId(channel.toDao().getId());
                 }
                 App.getDaoSession().getArticleDao().insertOrReplaceInTx(RSS2Item.toDaos(itemList));
+                App.getDaoSession().getSourceDao().update(channel.toDao());
+
+                updateData(channel, itemList);
             }
+
             if (index >= total - 1) {
                 ptrLayout.refreshComplete();
             }
         }
     };
+
+    private void updateData(RSS2Channel channel, List<RSS2Item> itemList) {
+//        Log.i("houxg", "UI change start, saving " + showTime());
+        DateTime dateTime = new DateTime().withMillisOfDay(0);
+        long today = dateTime.getMillis();
+//        Log.i("houxg", "today=" + dateTime.toString("yyyy-MM-dd HH:mm:ss") + ", mills=" + today);
+        int endPos = -1;
+        for (int i = 0; i < itemList.size(); i++) {
+            RSS2Item item = itemList.get(i);
+            if (item.getPubDate() >= today) {
+                endPos = i;
+            }
+        }
+        if (endPos > 0) {
+            itemList = itemList.subList(0, endPos);
+        } else {
+            itemList.clear();
+        }
+//        Log.i("houxg", "UI data pre-handle, " + showTime());
+
+        int pos = adapter.getItemCount();
+        adapter.insertOrReplace(channel, itemList);
+        adapter.notifyDataSetChanged();
+//        Log.i("houxg", "UI data updated, " + showTime());
+    }
+
+    String showTime() {
+        long now = System.currentTimeMillis();
+        String dt = "dt=" + (now - time);
+        time = now;
+        return dt;
+    }
 }

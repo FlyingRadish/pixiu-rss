@@ -169,6 +169,7 @@ public class ArticleDao extends AbstractDao<Article, Long> {
             if (source_ArticleListQuery == null) {
                 QueryBuilder<Article> queryBuilder = queryBuilder();
                 queryBuilder.where(Properties.SourceId.eq(null));
+                queryBuilder.orderRaw("T.'PUB_TIME' DESC");
                 source_ArticleListQuery = queryBuilder.build();
             }
         }

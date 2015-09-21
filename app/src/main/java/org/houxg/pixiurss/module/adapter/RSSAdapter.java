@@ -9,6 +9,7 @@ import org.houxg.pixiurss.R;
 import org.houxg.pixiurss.model.RSS2Channel;
 import org.houxg.pixiurss.model.RSS2Item;
 import org.houxg.pixiurss.utils.recyclerview.RecyclerListAdapter;
+import org.houxg.pixiurss.utils.toolbox.ListTool;
 import org.joda.time.DateTime;
 
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ public class RSSAdapter extends RecyclerListAdapter<Object, RecyclerView.ViewHol
 
     public RSSAdapter(List<Object> data) {
         super(R.layout.item_rssitem, data);
+        channelWrappers = new ArrayList<>();
     }
 
     @Override
@@ -51,7 +53,7 @@ public class RSSAdapter extends RecyclerListAdapter<Object, RecyclerView.ViewHol
     @Override
     public int getItemViewType(int position) {
         Object obj = getItem(position);
-        if (obj instanceof RSS2Channel) {
+        if (obj instanceof ChannelWrapper) {
             return TYPE_CHANNEL;
         } else {
             return TYPE_ITEM;
@@ -60,10 +62,10 @@ public class RSSAdapter extends RecyclerListAdapter<Object, RecyclerView.ViewHol
 
     @Override
     public void onBind(RecyclerView.ViewHolder holder, Object obj, int position) {
-        if (obj instanceof RSS2Channel) {
-            RSS2Channel channel = (RSS2Channel) obj;
+        if (obj instanceof ChannelWrapper) {
+            ChannelWrapper channel = (ChannelWrapper) obj;
             ChannelViewHolder channelViewHolder = (ChannelViewHolder) holder;
-            channelViewHolder.textAlias.setText(channel.getLink());
+            channelViewHolder.textAlias.setText(channel.wrapper.getAlias());
         }
         if (obj instanceof RSS2Item) {
             RSS2Item item = (RSS2Item) obj;
@@ -98,18 +100,30 @@ public class RSSAdapter extends RecyclerListAdapter<Object, RecyclerView.ViewHol
         return holder;
     }
 
-    public void insert(RSS2Channel channel, List<RSS2Item> items) {
+    List<ChannelWrapper> channelWrappers;
+
+    public void insertOrReplace(RSS2Channel channel, List<RSS2Item> items) {
         if (data == null) {
             data = new ArrayList<>();
         }
-        data.add(channel);
-        data.addAll(items);
+        ChannelWrapper wrapper = new ChannelWrapper();
+        wrapper.wrapper = channel;
+        int pos = data.indexOf(wrapper);
+        if (pos < 0) {
+            wrapper = new ChannelWrapper();
+            wrapper.wrapper = channel;
+            wrapper.size = items.size();
+            data.add(wrapper);
+            data.addAll(items);
+        } else {
+            wrapper = (ChannelWrapper) data.get(pos);
+            ListTool.mergeList(data, items, pos + 1, pos + wrapper.size);
+            wrapper.size = items.size();
+        }
     }
 
-    public void changeSource(RSS2Channel channel, List<RSS2Item> items) {
+    public void removeAll() {
         data = new ArrayList<>();
-        data.add(channel);
-        data.addAll(items);
     }
 
     public void setClickedListener(OnArticleClickedListener clickedListener) {
@@ -146,5 +160,21 @@ public class RSSAdapter extends RecyclerListAdapter<Object, RecyclerView.ViewHol
 
     static class ChannelWrapper {
         RSS2Channel wrapper;
+        int size = 0;
+
+        @Override
+        public boolean equals(Object o) {
+            if (wrapper == null) {
+                return false;
+            }
+            if (o instanceof ChannelWrapper) {
+                ChannelWrapper channelWrapper = (ChannelWrapper) o;
+                return wrapper.equals(channelWrapper.wrapper);
+            } else if (o instanceof RSS2Channel) {
+                RSS2Channel channel = (RSS2Channel) o;
+                return wrapper.equals(channel);
+            }
+            return false;
+        }
     }
 }

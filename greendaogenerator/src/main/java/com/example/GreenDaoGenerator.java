@@ -4,6 +4,7 @@ import de.greenrobot.daogenerator.DaoGenerator;
 import de.greenrobot.daogenerator.Entity;
 import de.greenrobot.daogenerator.Property;
 import de.greenrobot.daogenerator.Schema;
+import de.greenrobot.daogenerator.ToMany;
 
 public class GreenDaoGenerator {
 
@@ -14,7 +15,7 @@ public class GreenDaoGenerator {
         new DaoGenerator().generateAll(schema, "./app/src-gen");
     }
 
-    private static Entity addRSS(Schema schema){
+    private static Entity addRSS(Schema schema) {
         Entity channel = schema.addEntity("Source");
         channel.addIdProperty().primaryKey().autoincrement().getProperty();
         channel.addStringProperty("alias");
@@ -25,12 +26,13 @@ public class GreenDaoGenerator {
         article.addIdProperty().primaryKey().autoincrement().getProperty();
         article.addStringProperty("title");
         article.addStringProperty("link").unique();
-        article.addLongProperty("pubTime");
+        Property articlePubTime = article.addLongProperty("pubTime").getProperty();
         article.addStringProperty("desc");
         Property sourceId = article.addLongProperty("SourceId").getProperty();
 
         article.addToOne(channel, sourceId);
-        channel.addToMany(article, sourceId);
+        ToMany articlesRel = channel.addToMany(article, sourceId);
+        articlesRel.orderDesc(articlePubTime);
         return article;
     }
 }

@@ -46,6 +46,7 @@ public class AppBar extends RelativeLayout {
         textTitle = (TextView) findViewById(R.id.title);
         actionPanel = (LinearLayout) findViewById(R.id.actions);
 
+        imgNavigator.setVisibility(GONE);
         post(new Runnable() {
             @Override
             public void run() {
@@ -71,6 +72,7 @@ public class AppBar extends RelativeLayout {
     }
 
     public void setNavigatorResource(@DrawableRes int resId) {
+        imgNavigator.setVisibility(VISIBLE);
         imgNavigator.setImageResource(resId);
     }
 
@@ -85,7 +87,7 @@ public class AppBar extends RelativeLayout {
         textView.setId(id);
         textView.setText(text);
         textView.setGravity(Gravity.CENTER);
-        textView.setPadding(10, 0,10,0);
+        textView.setPadding(10, 0, 10, 0);
         textView.setTextColor(Color.WHITE);
         return textView;
     }
