@@ -9,7 +9,6 @@ import org.houxg.pixiurss.R;
 import org.houxg.pixiurss.model.RSS2Channel;
 import org.houxg.pixiurss.model.RSS2Item;
 import org.houxg.pixiurss.utils.recyclerview.RecyclerListAdapter;
-import org.houxg.pixiurss.utils.toolbox.ListTool;
 import org.joda.time.DateTime;
 
 import java.util.ArrayList;
@@ -29,12 +28,6 @@ public class RSSAdapter extends RecyclerListAdapter<Object, RecyclerView.ViewHol
 
     private static final int TYPE_CHANNEL = 1;
     private static final int TYPE_ITEM = 2;
-
-    public interface OnArticleClickedListener {
-        void clickArticle(RSS2Item item);
-    }
-
-    OnArticleClickedListener clickedListener;
 
     public RSSAdapter(List<Object> data) {
         super(R.layout.item_rssitem, data);
@@ -85,17 +78,7 @@ public class RSSAdapter extends RecyclerListAdapter<Object, RecyclerView.ViewHol
         if (viewType == TYPE_CHANNEL) {
             holder = new ChannelViewHolder(view);
         } else {
-            ItemViewHolder itemViewHolder = new ItemViewHolder(view);
-            itemViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    RSS2Item item = (RSS2Item) v.getTag();
-                    if (clickedListener != null) {
-                        clickedListener.clickArticle(item);
-                    }
-                }
-            });
-            holder = itemViewHolder;
+            holder = new ItemViewHolder(view);
         }
         return holder;
     }
@@ -109,25 +92,51 @@ public class RSSAdapter extends RecyclerListAdapter<Object, RecyclerView.ViewHol
         ChannelWrapper wrapper = new ChannelWrapper();
         wrapper.wrapper = channel;
         int pos = data.indexOf(wrapper);
+        int animPos;
         if (pos < 0) {
+            animPos = data.size();
             wrapper = new ChannelWrapper();
             wrapper.wrapper = channel;
             wrapper.size = items.size();
             data.add(wrapper);
             data.addAll(items);
+            notifyItemRangeInserted(animPos, items.size() + 1);
         } else {
             wrapper = (ChannelWrapper) data.get(pos);
-            ListTool.mergeList(data, items, pos + 1, pos + wrapper.size);
+            int start = pos + 1;
+            int end = pos + wrapper.size;
+            int range = end - start + 1;
+            boolean shouldDelete = range >= items.size();
+            int index = start;
+            int changeEnd = index + (shouldDelete ? items.size() : range);
+            int deleteEnd = index + range;
+            int itemIndex = 0;
+            animPos = index;
+            for (; index < changeEnd; index++) {
+                data.set(index, items.get(itemIndex));
+                itemIndex++;
+            }
+            notifyItemRangeChanged(animPos, itemIndex);
+            if (shouldDelete) {
+                int deleteStickIndex = index;
+                animPos = index;
+                for (; index < deleteEnd; index++) {
+                    data.remove(deleteStickIndex);
+                }
+                notifyItemRangeRemoved(animPos, deleteEnd - animPos - 1);
+            } else {
+                List<RSS2Item> addItems = items.subList(itemIndex, items.size());
+                data.addAll(index, addItems);
+                notifyItemRangeInserted(index, addItems.size());
+            }
             wrapper.size = items.size();
         }
     }
 
     public void removeAll() {
+        int size = data.size();
         data = new ArrayList<>();
-    }
-
-    public void setClickedListener(OnArticleClickedListener clickedListener) {
-        this.clickedListener = clickedListener;
+        notifyItemRangeRemoved(0, size);
     }
 
     static class ChannelViewHolder extends RecyclerView.ViewHolder {

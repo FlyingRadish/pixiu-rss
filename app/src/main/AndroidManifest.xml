@@ -34,7 +34,7 @@
         </activity>
 
         <activity android:name=".ui.ArticleWebActivity" />
-        <activity android:name=".ui.ChannelAddActivity" />
+        <activity android:name=".ui.ChannelEditActivity" />
 
 
         <activity android:name=".ui.ChannelManagerActivity"

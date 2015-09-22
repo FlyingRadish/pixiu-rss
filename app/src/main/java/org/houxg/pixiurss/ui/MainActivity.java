@@ -1,6 +1,7 @@
 package org.houxg.pixiurss.ui;
 
 import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -17,6 +18,7 @@ import org.houxg.pixiurss.module.adapter.RSSAdapter;
 import org.houxg.pixiurss.module.rss.RSSGetter;
 import org.houxg.pixiurss.ui.base.BaseActivity;
 import org.houxg.pixiurss.utils.recyclerview.LinearItemDecoration;
+import org.houxg.pixiurss.utils.recyclerview.RecyclerItemClickListener;
 import org.houxg.pixiurss.utils.toolbox.OpenTool;
 import org.joda.time.DateTime;
 
@@ -73,8 +75,11 @@ public class MainActivity extends BaseActivity {
         itemDecoration.setDividerSize(18);
         listItem.setLayoutManager(layout);
         listItem.addItemDecoration(itemDecoration);
+        listItem.setItemAnimator(new DefaultItemAnimator());
+        listItem.addOnItemTouchListener(new RecyclerItemClickListener(this).setItemClickListener(itemClickListener));
+
         adapter = new RSSAdapter(null);
-        adapter.setClickedListener(articleClickedListener);
+//        adapter.setArticleClickedListener(articleClickedListener);
         listItem.setAdapter(adapter);
 
         MaterialHeader header = new MaterialHeader(this);
@@ -124,7 +129,7 @@ public class MainActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        if (getter.isRunning()) {
+        if (getter != null && getter.isRunning()) {
             ptrLayout.refreshComplete();
             getter.cancel();
         } else {
@@ -132,13 +137,44 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    RSSAdapter.OnArticleClickedListener articleClickedListener = new RSSAdapter.OnArticleClickedListener() {
-        @Override
-        public void clickArticle(RSS2Item item) {
-            Bundle bundle = ArticleWebActivity.getOpenBundle(item.getLink());
-            OpenTool.startActivity(MainActivity.this, ArticleWebActivity.class, bundle);
+
+    private void updateData(RSS2Channel channel, List<RSS2Item> itemList) {
+//        Log.i("houxg", "UI change start, saving " + showTime());
+        DateTime dateTime = new DateTime().withMillisOfDay(0);
+        long today = dateTime.getMillis();
+//        Log.i("houxg", "today=" + dateTime.toString("yyyy-MM-dd HH:mm:ss") + ", mills=" + today);
+        int endPos = -1;
+        for (int i = 0; i < itemList.size(); i++) {
+            RSS2Item item = itemList.get(i);
+            if (item.getPubDate() >= today) {
+                endPos = i;
+            }
         }
-    };
+        if (endPos > 0) {
+            itemList = itemList.subList(0, endPos);
+        } else {
+            itemList.clear();
+        }
+//        Log.i("houxg", "UI data pre-handle, " + showTime());
+        int pos = adapter.getItemCount();
+        adapter.insertOrReplace(channel, itemList);
+        //        Log.i("houxg", "UI data updated, " + showTime());
+    }
+
+    String showTime() {
+        long now = System.currentTimeMillis();
+        String dt = "dt=" + (now - time);
+        time = now;
+        return dt;
+    }
+
+    //    RSSAdapter.OnArticleClickedListener articleClickedListener = new RSSAdapter.OnArticleClickedListener() {
+//        @Override
+//        public void clickArticle(RSS2Item item) {
+//            Bundle bundle = ArticleWebActivity.getOpenBundle(item.getLink());
+//            OpenTool.startActivity(MainActivity.this, ArticleWebActivity.class, bundle);
+//        }
+//    };
     RSSGetter.ErrorListener errorListener = new RSSGetter.ErrorListener() {
         @Override
         public void onError(int index, int total) {
@@ -173,36 +209,17 @@ public class MainActivity extends BaseActivity {
             }
         }
     };
-
-    private void updateData(RSS2Channel channel, List<RSS2Item> itemList) {
-//        Log.i("houxg", "UI change start, saving " + showTime());
-        DateTime dateTime = new DateTime().withMillisOfDay(0);
-        long today = dateTime.getMillis();
-//        Log.i("houxg", "today=" + dateTime.toString("yyyy-MM-dd HH:mm:ss") + ", mills=" + today);
-        int endPos = -1;
-        for (int i = 0; i < itemList.size(); i++) {
-            RSS2Item item = itemList.get(i);
-            if (item.getPubDate() >= today) {
-                endPos = i;
+    RecyclerItemClickListener.OnItemClickListener itemClickListener = new RecyclerItemClickListener.OnItemClickListener() {
+        @Override
+        public void onItemClick(RecyclerView recyclerView, View view, int position) {
+            Object obj = adapter.getItem(position);
+            if (obj instanceof RSS2Item) {
+                RSS2Item item = (RSS2Item) obj;
+                Bundle bundle = ArticleWebActivity.getOpenBundle(item.getLink());
+                OpenTool.startActivity(MainActivity.this, ArticleWebActivity.class, bundle);
+            } else {
+                Log.wtf("houxg", "not a item");
             }
         }
-        if (endPos > 0) {
-            itemList = itemList.subList(0, endPos);
-        } else {
-            itemList.clear();
-        }
-//        Log.i("houxg", "UI data pre-handle, " + showTime());
-
-        int pos = adapter.getItemCount();
-        adapter.insertOrReplace(channel, itemList);
-        adapter.notifyDataSetChanged();
-//        Log.i("houxg", "UI data updated, " + showTime());
-    }
-
-    String showTime() {
-        long now = System.currentTimeMillis();
-        String dt = "dt=" + (now - time);
-        time = now;
-        return dt;
-    }
+    };
 }

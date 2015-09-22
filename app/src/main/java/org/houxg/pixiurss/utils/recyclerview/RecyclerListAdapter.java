@@ -27,7 +27,8 @@ public abstract class RecyclerListAdapter<T, VH extends RecyclerView.ViewHolder>
     @Override
     public VH onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(getLayoutIdByType(viewType), parent, false);
-        return onBindViewToVH(view, viewType);
+        VH holder = onBindViewToVH(view, viewType);
+        return holder;
     }
 
     protected int getLayoutIdByType(int type) {
@@ -52,14 +53,14 @@ public abstract class RecyclerListAdapter<T, VH extends RecyclerView.ViewHolder>
         }
     }
 
-    protected T getItem(int pos) {
+    public T getItem(int pos) {
         if (data == null || pos < 0 || pos > data.size() - 1) {
             return null;
         }
         return data.get(pos);
     }
 
-    public void changeDatasources(List<T> newData) {
+    public void changeDataSource(List<T> newData) {
         this.data = newData;
         notifyDataSetChanged();
     }

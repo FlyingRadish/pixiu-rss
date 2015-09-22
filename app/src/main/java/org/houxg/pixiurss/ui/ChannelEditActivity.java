@@ -8,7 +8,6 @@ import android.view.View;
 import android.widget.EditText;
 
 import org.houxg.pixiurss.R;
-import org.houxg.pixiurss.Source;
 import org.houxg.pixiurss.SourceDao;
 import org.houxg.pixiurss.model.RSS2Channel;
 import org.houxg.pixiurss.model.RSS2Item;
@@ -30,7 +29,13 @@ import butterknife.OnClick;
  * <br>
  * create on 2015/9/14
  */
-public class ChannelAddActivity extends BaseActivity {
+public class ChannelEditActivity extends BaseActivity {
+
+    private static final String BUNDLE_LINK = "link";
+    private static final int TYPE_ADD = 1;
+    private static final int TYPE_EDIT = 2;
+
+    private int type = TYPE_ADD;
 
     @Bind(R.id.edit_alias)
     EditText editAlias;
@@ -44,14 +49,38 @@ public class ChannelAddActivity extends BaseActivity {
     RSSGetter rssGetter;
     RSSAdapter adapter;
 
+    RSS2Channel channel;
+
     @Override
     protected int getLayoutId() {
         return R.layout.activity_channel_add;
     }
 
+    public static Bundle getOptOpenBundle(String link) {
+        Bundle bundle = new Bundle();
+        bundle.putString(BUNDLE_LINK, link);
+        return bundle;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        String link = getIntent().getStringExtra(BUNDLE_LINK);
+        channel = new RSS2Channel();
+        if (!TextUtils.isEmpty(link)) {
+            List<RSS2Channel> channels = RSS2Channel.fromDaos(App
+                    .getDaoSession()
+                    .getSourceDao()
+                    .queryBuilder()
+                    .where(SourceDao.Properties.Link.eq(link)).list());
+            if (channels.size() > 0) {
+                channel = channels.get(0);
+                editAlias.setText(channel.getAlias());
+                editLink.setText(channel.getLink());
+                type = TYPE_EDIT;
+            }
+        }
         listArticle.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         LinearItemDecoration itemDecoration = new LinearItemDecoration(12, 12, 12, 12);
         itemDecoration.setDividerSize(18);
@@ -65,19 +94,20 @@ public class ChannelAddActivity extends BaseActivity {
         String alias = editAlias.getText().toString();
         String link = editLink.getText().toString();
 
-        SourceDao channelDao = App.getDaoSession().getSourceDao();
-        Source channel = new Source();
         channel.setAlias(alias);
         channel.setLink(link);
 
         try {
-            channelDao.insert(channel);
+            if (type == TYPE_ADD) {
+                App.getDaoSession().getSourceDao().insert(channel.toDao());
+            } else {
+                App.getDaoSession().getSourceDao().update(channel.toDao());
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
             toast("出错了");
             return;
         }
-
         setResult(RESULT_OK);
         finish();
     }

@@ -77,11 +77,11 @@ public class RSS2SAXParser extends DefaultHandler {
             parentTag = localName;
             item = new RSS2Item();
         }
-        try {
-            Thread.sleep(50);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            Thread.sleep(50);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
     }
 
     @Override
