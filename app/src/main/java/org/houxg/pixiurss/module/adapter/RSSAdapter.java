@@ -134,9 +134,11 @@ public class RSSAdapter extends RecyclerListAdapter<Object, RecyclerView.ViewHol
     }
 
     public void removeAll() {
-        int size = data.size();
-        data = new ArrayList<>();
-        notifyItemRangeRemoved(0, size);
+        if (data != null) {
+            int size = data.size();
+            data = new ArrayList<>();
+            notifyItemRangeRemoved(0, size);
+        }
     }
 
     static class ChannelViewHolder extends RecyclerView.ViewHolder {

@@ -10,6 +10,7 @@
     <color name="title">#313842</color>
 
 
+
     <color name="dialog_btn_positive_bg_pressed">#aaaaaa</color>
     <color name="dialog_btn_positive_bg_normal">#ffffff</color>
     <color name="dialog_btn_negative_bg_pressed">#aaaaaa</color>

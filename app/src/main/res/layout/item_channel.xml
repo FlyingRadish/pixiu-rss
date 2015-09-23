@@ -1,19 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:elevation="2dp"
+    android:orientation="vertical"
     android:padding="8dp">
-    
+
+    <ImageView
+        android:id="@+id/icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/icon_rss" />
+
     <TextView
         android:id="@+id/text_alias"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignTop="@id/icon"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="2dp"
+        android:layout_toRightOf="@id/icon"
         android:text="cnBeta"
-        />
-    
+        android:textColor="#333"
+        android:textSize="14sp" />
+
     <TextView
         android:id="@+id/text_link"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="http://www.baidu.com"/>
-</LinearLayout>
+        android:layout_alignLeft="@id/text_alias"
+        android:layout_below="@id/text_alias"
+        android:layout_marginTop="4dp"
+        android:text="http://www.baidu.com"
+        android:textColor="#aaa"
+        android:textSize="12sp" />
+</RelativeLayout>

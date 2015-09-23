@@ -109,7 +109,7 @@ public class ChannelManagerActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         listChannel.setLayoutManager(new LinearLayoutManager(this));
-        listChannel.addItemDecoration(new LinearItemDecoration(0, 0, 0, 0).setDividerSize(12));
+        listChannel.addItemDecoration(new LinearItemDecoration(0, 24, 0, 0).setDividerSize(12));
         listChannel.setItemAnimator(new DefaultItemAnimator());
         helper.attachToRecyclerView(listChannel);
         listChannel.addOnItemTouchListener(new RecyclerItemClickListener(this)
@@ -157,7 +157,7 @@ public class ChannelManagerActivity extends BaseActivity {
 
         @Override
         public void onBind(ViewHolder holder, RSS2Channel item, int position) {
-            holder.textAlias.setText(item.getTitle());
+            holder.textAlias.setText(item.getAlias());
             holder.textLink.setText(item.getLink());
         }
 

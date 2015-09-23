@@ -150,11 +150,10 @@ public class MainActivity extends BaseActivity {
                 endPos = i;
             }
         }
-        if (endPos > 0) {
-            itemList = itemList.subList(0, endPos);
-        } else {
-            itemList.clear();
+        if (endPos <= 10) {
+            endPos = itemList.size() > 10 ? 10 : itemList.size();
         }
+        itemList = itemList.subList(0, endPos);
 //        Log.i("houxg", "UI data pre-handle, " + showTime());
         int pos = adapter.getItemCount();
         adapter.insertOrReplace(channel, itemList);
